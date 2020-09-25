@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>注册</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="" name="keywords"/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    } </script>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <link href="css/style.css" media="all" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:100,200,300,400,500,600,700,800,900'
+          rel='stylesheet' type='text/css'>
+
+    <script>
+        $(function () {
+            $("#register_submit").click(function () {
+                var flag = $("#registerForm").valid();
+                if (flag) {
+                    $.post("/zzMovies/user/registerUser",
+                        $("#registerForm").serialize(),
+                        function (data) {
+                            if (data.flag) {
+                                location.href = "register_ok.html";
+                            } else {
+                                alert(data.errorMsg);
+                                changeCheckCode($("#checkCodeImg").get(0));
+                            }
+                        },
+                        "json");
+                }
+            });
+
+            $.validator.addMethod("checkUser", function (value, element, param) {
+                var flag = false;
+                $.ajax({
+                    async: false,
+                    url: "/zzMovies/user/checkUser",
+                    data: {username: value},
+                    success: function (data) {
+                        flag = data.flag;
+                    },
+                    dataType: "json"
+                });
+                return flag;
+            });
+
+            $.validator.addMethod("checkCode", function (value, element, param) {
+                var flag = false;
+                $.ajax({
+                    async: false,
+                    url: "/zzMovies/code/checkCode",
+                    data: {check_code: value},
+                    success: function (data) {
+                        flag = data.flag;
+                    },
+                    dataType: "json"
+                });
+                return flag;
+            });
+
+            $("#registerForm").validate({
+                rules: {
+                    username: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 12,
+                        // 用户名是否存在
+                        checkUser: true
+                    },
+                    password: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 18
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    repassword: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 18,
+                        equalTo: "#password"
+                    },
+                    check: {
+                        required: true,
+                        // 验证码是否正确
+                        checkCode: true
+                    }
+                },
+                errorPlacement: function (error, element) {
+                    var cls = element.prop("class");
+                    if (cls.indexOf('error') > -1) {
+                        element.css("border", "solid 1px #ff0000");
+                    } else {
+                        element.css("border", "");
+                    }
+                },
+                success: function (element) {
+
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="container_wrap">
+        <!--页面头部-->
+        <div id="header"></div>
+
+        <div class="content">
+            <div class="register">
+                <div class="col-md-6 login-right">
+                    <h3>注册</h3>
+                    <p>请输入您的用户信息 带*号的信息必须填写</p>
+                    <form id="registerForm">
+                        <div>
+                            <span>用户名(*) :</span>
+                            <input autocomplete="off" id="username" name="username"
+                                   placeholder="请输入用户名"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none" type="text">
+                        </div>
+                        <div>
+                            <span>电子邮箱地址(*) :</span>
+                            <input autocomplete="off" id="email" name="email"
+                                   placeholder="请输入电子邮箱地址"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none" type="text">
+                        </div>
+                        <div>
+                            <span>密码(*) :</span>
+                            <input autocomplete="off" id="password" name="password"
+                                   placeholder="请输入密码"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none" type="password">
+                        </div>
+                        <div>
+                            <span>确认您的密码(*) :</span>
+                            <input autocomplete="off" id="repassword" name="repassword"
+                                   placeholder="请确认你的密码"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none" type="password">
+                        </div>
+                        <div>
+                            <span>电话号码 :</span>
+                            <input autocomplete="off" id="telephone" name="telephone"
+                                   placeholder="请输入电话号码"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none" type="text">
+                        </div>
+                        <div>
+                            <span>验证码:</span>
+                            <input autocomplete="off" name="check" placeholder="请输入验证码" style="width: 200px;margin-top: 10px; border-radius: 30px;outline: none"
+                                   type="text">
+                            <img id="checkCodeImg" alt="" onclick="changeCheckCode(this)" src="code/createCode" style="margin-left: 30px">
+                            <script type="text/javascript">
+                                //图片点击事件
+                                function changeCheckCode(img) {
+                                    img.src = "code/createCode?" + new Date().getTime();
+                                }
+                            </script>
+                        </div>
+                        <button id="register_submit" style="background-color: red;width: 100px;height: 34px;color: white; border-radius: 30px"
+                                type="button">
+                            注册
+                        </button>
+                    </form>
+                </div>
+
+                <div class="col-md-6 login-right">
+                    <h3>登录</h3>
+                    <p>如果您在我们这里有帐户，请前往登录。</p>
+                    <a href="login.html">点击此处进行登录！</a>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="container">
+    <!--页面底部-->
+    <div id="footer"></div>
+</div>
+<script src="js/include.js"></script>
+</body>
+</html>

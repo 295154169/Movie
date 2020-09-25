@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>电影</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:100,200,300,400,500,600,700,800,900'
+          rel='stylesheet' type='text/css'>
+    <script src="js/getParameter.js"></script>
+
+    <script>
+        //movie.html?mid=1&uid=10006
+        $(function () {
+            var mid = getParameter("mid");;
+            load(mid);
+            click(mid);
+            isGrade(mid);
+            isLike(mid);
+        })
+
+        function load(mid) {
+            $.get('/zzMovies/movie/detail', {mid: mid},
+                function (mv) {
+                    $("#video").attr("src", mv.video)
+                    $("#introduce").html(mv.introduce);
+                    $("#country").html(mv.country);
+                    $("#date").html(mv.date);
+                    $("#actor").html(mv.actor);
+                    $("#age").html(mv.age);
+                    var imgDiv = '<span class="movie_rating">'+mv.mScore+'</span>\n' +
+                        '         <img src="'+mv.smallImg+'" class="img-responsive" alt=""/>';
+                    $("#movieImg").html(imgDiv);
+                    $("#mname").html(mv.mName);
+                    $.post('/zzMovies/category/findCName',{cid:mv.cid},
+                        function (name) {
+                            $("#category").html(name);
+                        });
+
+                }, "json");
+
+            $.get('/zzMovies/movie/findComment', {mid:mid},
+                function (data) {
+                    var lis = '';
+                    for (var i = 0; i < data.length; i++) {
+                        lis += '<li id="comment">\n' +
+                            '                                <div class="data">\n' +
+                            '                                    <p id="title" style="color: #000;font-size: 1.1em;' +
+                            '                                       font-weight: 600;margin: 0 0 10px 0;">' + data[i].name + '&nbsp;&nbsp;发表于&nbsp;&nbsp;' + data[i].date + '</p>\n' +
+                            '                                    <p id="content">' + data[i].comment + '</p>\n' +
+                            '                                </div>\n' +
+                            '                                <div class="clearfix"></div>\n' +
+                            '                            </li>';
+                    }
+                    $("#single_list").html(lis);
+
+                }, "json");
+
+            $.get('/zzMovies/movie/findCount', {mid:mid},
+                function (count) {
+                    $("#comments").html('当前共' + count + '条评论');
+                }, "json")
+        }
+
+        function click(mid) {
+            $("#submit").click(function () {
+                $.get('/zzMovies/user/findOne',
+                    {},
+                    function (data) {
+                        if (data==null){
+                            alert("请先登录");
+                            location.href='/zzMovies/login.html';
+                        }else{
+                            if ($("#message").val()==""){
+                                alert("您还未输入评论");
+                            }else {
+                                $.post('/zzMovies/movie/comment',
+                                    {
+                                        mid: mid,
+                                        uid: data.uid,
+                                        message: $("#message").val()
+                                    },
+                                    function () {
+                                        alert("发表成功");
+                                        location.reload();
+                                    }, "json"
+                                )
+                            }
+                        }
+                    }, "json");
+            })
+        }
+        function grade() {
+            var mid = getParameter("mid");
+            $.get('/zzMovies/user/findOne',
+                {},
+                function (data) {
+                    if (data==null){
+                        alert("请先登录");
+                        location.href='/zzMovies/login.html';
+                    }else{
+                        $.post('/zzMovies/movie/grade',
+                            {
+                                mid: mid,
+                                uid: data.uid,
+                                score: $("#score").val(),
+                            },
+                            function () {
+                                alert("评分成功！");
+                                $("#score").attr("readonly","true");
+                            }, "json"
+                        )
+                    }
+                }, "json");
+
+        }
+        function isGrade(mid) {
+            $.get('/zzMovies/user/findOne',
+                {},
+                function (data) {
+                    $.get('/zzMovies/movie/isGrade',
+                        {
+                            uid:data.uid,
+                            mid:mid
+                        },
+                        function () {
+                            var ll='<input id="score" name="score" type="text" class="text" placeholder="已评分" readonly="true"\n' +
+                                '                               style="padding: 10px;width: 18%;font-size: 1.1em;border: none;color: #999;background: #fff;float: left;outline: none;"\n' +
+                                '                        >';
+                            $("#score1").html(ll);
+                            $("#grade").attr("style","background: #ccc");
+                        },"json")
+                }, "json");
+        }
+
+        function like() {
+                var mid = getParameter("mid");
+                $.get('/zzMovies/user/findOne',
+                    {},
+                    function (user) {
+                        if (user){
+                            $.get('/zzMovies/movie/addLike',
+                                {mid:mid},
+                                function () {
+                                    location.reload();
+                                },"json");
+                        }else {
+                            alert("请先登录!");
+                            location.href = '/zzMovies/login.html';
+                        }
+                    },"json");
+        }
+        function isLike(mid) {
+            //是否被收藏
+            $.get('/zzMovies/movie/isLike',
+                {mid:mid},
+                function (info) {
+                    if (info.flag){
+                        $("#like").val("已收藏");
+                        $("#like").removeAttr("onclick");
+                        $("#like").attr("style","background: #ccc");
+                    }
+                },"json");
+        }
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="container_wrap">
+
+        <div id="header"></div>
+
+        <div class="content">
+            <div class="movie_top">
+                <div class="col-md-8 movie_box">
+                    <!--播放器,ajax更新-->
+                    <div class="video_1" style="width: 100%;height: 470px">
+                        <iframe id="video" height="100%" width="100%"
+                                scrolling="no" border="0" frameborder="no" framespacing="0"
+                                allowfullscreen="true"></iframe>
+                    </div>
+                    <div class="clearfix"></div>
+                    <p class="m_4" id="introduce"></p>
+
+                    <div class="form-submit1" style="float: left">
+                        <input name="like" type="button" id="like" value="收藏" onclick="like()"><br>
+                    </div>
+                    <div id="score1" class="grade_1" style="margin-left: 325px">
+                        <input id="score" name="score" type="text" class="text" placeholder="请打分"
+                               style="padding: 10px;width: 18%;font-size: 1.1em;border: none;color: #999;background: #fff;float: left;outline: none;"
+                        >
+                    </div>
+                    <div class="form-submit1" style="margin-left: 20px;float: left">
+                        <input name="grade" type="button" id="grade" value="提交" onclick="grade()"><br>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="text" style="margin-top: 10px">
+                        <textarea id="message" name="message" value=""></textarea>
+                    </div>
+                    <div class="form-submit1">
+                        <input name="submit" type="button" id="submit" value="发表评论"><br>
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <div class="single">
+                        <h1 id="comments">当前共10条评论</h1>
+                        <ul class="single_list" id="single_list">
+                            <li id="comment">
+                                <div class="data">
+                                    <p id="title"
+                                       style="color: #000;font-size: 1.1em;font-weight: 600;margin: 0 0 10px 0;">Movie /
+                                        2 hours ago /</p>
+                                    <p id="content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+                                        nonummy nibh
+                                        euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad
+                                        minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut
+                                        aliquip ex ea commodo consequat.</p>
+                                </div>
+                                <div class="clearfix"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4 movie_info" style="height: 870px">
+                    <div class="grid images_3_of_2" style="width: 75%;float: right;margin-right: 40px;">
+                        <div id="movieImg" class="movie_image">
+                            <span class="movie_rating">5.0</span>
+                            <img src="images/single.jpg" class="img-responsive" alt=""/>
+                        </div>
+                        <div class="desc1 span_3_of_2" style="margin-top: 40px">
+                            <span class="movie_option"><strong>地区: </strong></span>
+                            <p id="country">established, USA</p><br/>
+                            <span class="movie_option"><strong>年份: </strong></span>
+                            <p id="date">2014</p><br/>
+                            <span class="movie_option"><strong>分类: </strong></span>
+                            <p id="category">Adventure, Fantazy</p><br/>
+                            <span class="movie_option"><strong>演员: </strong></span>
+                            <p id="actor">anything, Lorem, Ipsum, Virginia, variations</p><br/>
+                            <span class="movie_option"><strong>年龄推荐: </strong></span>
+                            <p id="age">13</p><br/>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="container">
+        <div id="footer"></div>
+    </div>
+    <script type="text/javascript" src="js/include.js"></script>
+</body>
+</html>

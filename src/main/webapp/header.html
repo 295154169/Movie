@@ -1,0 +1,51 @@
+<script>
+    $(function () {
+        $.get('/zzMovies/user/findOne',
+            {},
+            function (data) {
+                var msg = data.name;
+                var list;
+                if (data.name == null) {
+                    list = '<li><p><a href="login.html">登录</a></p></li>\n' +
+                        '<li><p><a href="register.html">注册</a></p></li>'
+                } else {
+                    list = '<li><p><a href="userCenter.html?uid=' + data.uid + '">' + data.name + '</a></p></li>\n' +
+                        '<li><p><a href="javascript:location.href=\'/zzMovies/user/logout\';">退出</a></a></p></li>'
+                }
+                $("#login_state").html(list);
+            }, "json");
+
+        $.get('/zzMovies/category/findAll',
+            {},
+            function (data) {
+                var lis = '';
+                for (var i = 0; i < data.length; i++) {
+                    var li = '<li><span class="simptip-position-bottom simptip-movable" data-tooltip="' + data[i].cname + '"><a\n' +
+                        '                    href="movie_list.html?cid=' + data[i].cid + '"> </a></span></li>';
+                    lis += li;
+                }
+                $("#navlis").html(lis);
+            }, "json");
+    })
+</script>
+<div id="header" class="header_top">
+    <div class="col-sm-3 logo"><a href="index.html"><img src="images/logo.png" alt=""/></a></div>
+    <div class="col-sm-6 nav">
+        <ul id="navlis">
+
+        </ul>
+    </div>
+
+    <div class="col-sm-3 header_right">
+        <ul class="header_right_box">
+            <!-- 判断是否登录, 如果登录了就显示 username 和 退出
+                             如果还没登录就显示 登录 和 注册 -->
+            <div id="login_state">
+                <li><p><a href="login.html">登录</a></p></li>
+                <li><p><a href="register.html">注册</a></p></li>
+            </div>
+            <div class="clearfix"></div>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+</div>

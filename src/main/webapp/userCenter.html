@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>个人中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    }
+    </script>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:100,200,300,400,500,600,700,800,900'
+          rel='stylesheet' type='text/css'>
+
+    <script>
+        $(function () {
+            $.get('/zzMovies/user/findOne',
+                {},
+                function (data) {
+                    $("#uid").val(data.uid);
+                    $("#username").val(data.username);
+                    $("#email").val(data.email);
+                    // $("#password").val(data.password);
+                    $("#name").val(data.name);
+                    $("#birthday").val(data.birthday);
+                    $("#telephone").val(data.telephone);
+                    var genderLis = '';
+                    if (data.gender == '男') {
+                        genderLis = '<span>性别 :</span>\n' +
+                            '<input type="radio" name="gender" value="男" checked> 男\n' +
+                            '<input type="radio" name="gender" value="女"> 女'
+                    } else {
+                        genderLis = '<span>性别 :</span>\n' +
+                            '<input type="radio" name="gender" value="男"> 男\n' +
+                            '<input type="radio" name="gender" value="女" checked> 女'
+                    }
+                    $("#gender").html(genderLis);
+
+                    $.get('/zzMovies/movie/findLike',
+                        {uid:data.uid},
+                        function (pb) {
+                            var lisList = '';
+                            for (var i = 0; i < pb.length; i++) {
+                                var movie = pb[i];
+                                var li = '<table id="likeList">\n' +
+                                    '                        <tr>\n' +
+                                    '                            <td>' +
+                                    '                               <a href="movie.html?mid=' + movie.mid + '" class="movie-beta__link">' +
+                                    '                                   <img src=" ' + movie.smallImg + '" style="width: 100px;height: 150px">' +
+                                    '                               </a></td>\n' +
+                                    '                            <td><span>片名: ' + movie.mName + '</span><br><span>国家 | ' + movie.country + '</span><br><span>演员:' + movie.actor + '</span></td>\n' +
+                                    '                        </tr>\n' +
+                                    '                        <tr><span><br></span></tr>\n' +
+                                    '                    </table> '
+                                lisList += li;
+                            }
+                            $("#likeList").html(lisList);
+                        }, "json");
+                }, "json");
+
+
+
+            $("#alter_userInfo").click(function () {
+                var flag = $("#alterForm").valid();
+                if (flag) {
+                    $.post("/zzMovies/user/update",
+                        $("#alterForm").serialize(),
+                        function (data) {
+                            if (data.flag) {
+                                alert("修改成功!请重新登录");
+                                location.href = "/zzMovies/user/logout";
+                            } else {
+                                alert(data.errorMsg);
+                            }
+                        },
+                        "json");
+                }
+            });
+
+            $("#alterForm").validate({
+                rules: {
+                    password: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 18
+                    },
+                    name: {
+                        required: true,
+                        minlength: 1,
+                        maxlength: 20
+                    },
+                    telephone: {
+                        minlength: 11,
+                        maxlength: 20
+                    }
+                },
+                errorPlacement: function (error, element) {
+                    var cls = element.prop("class");
+                    if (cls.indexOf('error') > -1) {
+                        element.css("border", "solid 1px #ff0000");
+                    } else {
+                        element.css("border", "");
+                    }
+                },
+                success: function (element) {
+
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="container_wrap">
+        <div id="header"></div>
+
+        <div class="content">
+            <div class="register">
+                <div class="col-md-6 login-right">
+                    <h2>个人信息</h2>
+                    <form id="alterForm">
+                        <div>
+                            <span>UID&nbsp;:</span>
+                            <input name="uid" id="uid" type="text"
+                                   style="margin-top: 10px; border-radius: 30px ;background-color:#cccccc"
+                                   value="" readonly="true">
+                        </div>
+                        <div>
+                            <span>用户名&nbsp;:</span>
+                            <input name="username" id="username" type="text"
+                                   style="margin-top: 10px; border-radius: 30px ;outline: none;background-color:#cccccc"
+                                   value="" readonly="true">
+                        </div>
+                        <div>
+                            <span>电子邮箱地址&nbsp;:</span>
+                            <input name="email" id="email" type="text"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none;background-color:#cccccc"
+                                   value="" readonly="true">
+                        </div>
+                        <div>
+                            <span>密码&nbsp;:</span>
+                            <input name="password" id="password" type="text"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none"
+                                   value="">
+                        </div>
+                        <div>
+                            <span>昵称&nbsp;:</span>
+                            <input name="name" id="name" type="text"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none"
+                                   value="">
+                        </div>
+                        <div>
+                            <span>生日&nbsp;:</span>
+                            <input name="birthday" id="birthday" type="date" value="2000-01-01"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none">
+                        </div>
+                        <div id="gender">
+
+                        </div>
+                        <div>
+                            <span>电话号码&nbsp;:</span>
+                            <input name="telephone" id="telephone" type="text"
+                                   style="margin-top: 10px; border-radius: 30px;outline: none"
+                                   value="">
+                        </div>
+                        <button type="button" id="alter_userInfo"
+                                style="background-color: red;width: 150px;height: 34px;color: white; border-radius: 30px;outline: none">
+                            保存修改信息
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6 login-right">
+                    <h2>我的收藏列表</h2>
+                    <table id="likeList">
+
+                    </table>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div id="footer"></div>
+</div>
+<script src="js/include.js"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    } </script>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <!-- start plugins -->
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:100,200,300,400,500,600,700,800,900'
+          rel='stylesheet' type='text/css'>
+    <script src="js/responsiveslides.min.js"></script>
+    <script>
+        $(function () {
+            //loadTopThree();
+            loadTopTen();
+            $("#slider").responsiveSlides({
+                auto: true,
+                nav: false,
+                speed: 500,
+                namespace: "callbacks",
+                pager: true,
+            });
+        });
+
+        // function loadTopThree() {
+        //     $.get("/zzMovies/movie/findTopThree",
+        //         {},
+        //         function (movieList) {
+        //             var lis = "";
+        //             for (var k = 0; k < 3; k++) {
+        //                 var li = '<li><img src="' + movieList[k].bigImg + '" class="img-responsive" alt=""/>\n' +
+        //                     '         <div class="button">\n' +
+        //                     '             <a href="movie.html?mid=' + movieList[k].mid + '" class="hvr-shutter-out-horizontal">现在观看</a>\n' +
+        //                     '         </div>\n' +
+        //                     '     </li>';
+        //                 lis += li;
+        //             }
+        //             $("#slider").html(lis);
+        //         },
+        //         "json"
+        //     );
+        // }
+
+        function loadTopTen() {
+            $.get("/zzMovies/movie/findTopTen",
+                {},
+                function (movieList) {
+                    var trs1 = "";
+                    var trs2 = "";
+                    for (var i = 0; i < 5; i++) {
+                        var tds1 = '<td width="20%" style="vertical-align: top">\n' +
+                            '                    <div class="col_1 col_2">\n' +
+                            '                        <ul class="list_4" style="width: 216.8px;height: 500px">\n' +
+                            '                            <div class="m_8"><a href="movie.html?mid=' + movieList[i].mid + '"><img src="' + movieList[i].smallImg + '"\n' +
+                            '                                                                       style="width: 200px;height: 300px" class="img-responsive"\n' +
+                            '                                                                       alt=""/></a></div>\n' +
+                            '                            <br/>\n' +
+                            '                            <li><h3>' + movieList[i].mName + '</h3></li>\n' +
+                            '                            <li>评分 : &nbsp;&nbsp;<p>' + movieList[i].mScore + ' 分</p></li>\n' +
+                            '                            <li>上映时间 : &nbsp;<span class="m_4">' + movieList[i].date + '</span></li>\n' +
+                            '                            <li><i class="icon1"> </i>\n' +
+                            '                                <p>' + movieList[i].count + '</p></li>\n' +
+                            '                        </ul>\n' +
+                            '                    </div>\n' +
+                            '                </td>';
+                        trs1 += tds1;
+                    }
+                    for (var j = 5; j < 10; j++) {
+                        var tds2 = '<td width="20%" style="vertical-align: top">\n' +
+                            '                    <div class="col_1 col_2">\n' +
+                            '                        <ul class="list_4" style="width: 216.8px;height: 500px">\n' +
+                            '                            <div class="m_8"><a href="movie.html?mid=' + movieList[j].mid + '"><img src="' + movieList[j].smallImg + '"\n' +
+                            '                                                                       style="width: 200px;height: 300px" class="img-responsive"\n' +
+                            '                                                                       alt=""/></a></div>\n' +
+                            '                            <br/>\n' +
+                            '                            <li><h3>' + movieList[j].mName + '</h3></li>\n' +
+                            '                            <li>评分 : &nbsp;&nbsp;<p>' + movieList[j].mScore + ' 分</p></li>\n' +
+                            '                            <li>上映时间 : &nbsp;<span class="m_4">' + movieList[j].date + '</span></li>\n' +
+                            '                            <li><i class="icon1"> </i>\n' +
+                            '                                <p>' + movieList[j].count + '</p></li>\n' +
+                            '                        </ul>\n' +
+                            '                    </div>\n' +
+                            '                </td>';
+                        trs2 += tds2;
+                    }
+                    $("#tr1").html(trs1);
+                    $("#tr2").html(trs2);
+                },
+                "json"
+            );
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="container_wrap">
+        <!--引入头部-->
+        <div id="header"></div>
+        <!--轮播栏-->
+        <div class="slider">
+            <div class="callbacks_container" >
+                <ul class="rslides" id="slider">
+                    <li><img src="img/product/bigimg/4_fsx_big.jpg" class="img-responsive" alt=""
+                             style="height: 700px;"/>
+                        <div class="button">
+                            <a href="movie.html?mid=4" class="hvr-shutter-out-horizontal">现在观看</a>
+                        </div>
+                    </li>
+                    <li><img src="img/product/bigimg/9_Interstellar_big.jpg" class="img-responsive" alt=""
+                             style="height: 700px;"/>
+                        <div class="button">
+                            <a href="movie.html?mid=9" class="hvr-shutter-out-horizontal">现在观看</a>
+                        </div>
+                    </li>
+                    <li><img src="img/product/bigimg/15_Inception_big.jpg" class="img-responsive" alt=""
+                             style="height: 700px;"/>
+                        <div class="button">
+                            <a href="movie.html?mid=15" class="hvr-shutter-out-horizontal">现在观看</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--轮播栏下面-->
+        <div class="content">
+            <!--搜索那一栏-->
+            <div class="box_1">
+                <h1 class="m_2">Top 10 Movies</h1>
+                <div class="clearfix"></div>
+            </div>
+            <div class="box_2">
+                <table style="width: 100%;">
+                    <tr id="tr1">
+
+                    </tr>
+                    <tr id="tr2">
+
+                    </tr>
+                </table>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--footer-->
+<div class="container">
+    <div id="footer"></div>
+</div>
+<!--导入布局js，共享header和footer-->
+<script type="text/javascript" src="js/include.js"></script>
+</body>
+</html>

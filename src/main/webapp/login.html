@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    }
+    </script>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:100,200,300,400,500,600,700,800,900'
+          rel='stylesheet' type='text/css'>
+
+    <script>
+        $(function () {
+            //点击登录按钮
+            $("#login").click(function () {
+                $.post("/zzMovies/user/login",
+                    $("#loginForm").serialize(),
+                    function (data) {
+                        if (data.flag) {
+                            window.history.back();
+                            var uri = location.search.split('/')[1];
+                            if (uri = 'zzMovies/login.html') {
+                                location.href = "/zzMovies/index.html";
+                            }
+                        } else {
+                            changeCheckCode($("#checkCodeImg").get(0));
+                            alert(data.errorMsg);
+                        }
+                    },
+                    "json"
+                );
+            });
+        });
+
+        //图片点击事件
+        function changeCheckCode(img) {
+            img.src = "code/createCode?" + new Date().getTime();
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="container_wrap">
+        <!--页面头部-->
+        <div id="header"></div>
+
+        <div class="content">
+
+            <div class="col-md-6 login-left">
+                <h3>注册</h3>
+                <p>成为我们网站的会员，您可以拥有更多更棒的功能，拥有更好的用户体验！</p>
+                <a href="register.html">申请一个新的账号</a>
+            </div>
+
+            <div class="col-md-6 login-right">
+                <h3>登录</h3>
+                <p>如果您在我们这里有帐户，请登录您的账号。</p>
+                <form id="loginForm">
+                    <div>
+                        <span>用户名:</span>
+                        <input name="username" type="text" placeholder="请输入用户名"
+                               style="margin-top: 10px; border-radius: 30px;outline: none"
+                               autocomplete="off">
+                    </div>
+                    <div>
+                        <span>密码:</span>
+                        <input name="password" type="password" placeholder="请输入密码"
+                               style="margin-top: 10px; border-radius: 30px;outline: none"
+                               autocomplete="off">
+                    </div>
+                    <div>
+                        <span>验证码:</span>
+                        <input name="check" type="text" placeholder="请输入验证码" autocomplete="off"
+                               style="width: 200px;margin-top: 10px; border-radius: 30px;outline: none">
+                        <img id="checkCodeImg" src="code/createCode" alt="" onclick="changeCheckCode(this)"
+                             style="margin-left: 30px">
+                    </div>
+                    <button type="button" id="login"
+                            style="background-color: red;width: 100px;height: 34px;color: white; border-radius: 30px;outline: none">
+                        登录
+                    </button>
+                </form>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<!--页面底部-->
+<div class="container">
+    <div id="footer"></div>
+</div>
+<script src="js/include.js"></script>
+</body>
+</html>

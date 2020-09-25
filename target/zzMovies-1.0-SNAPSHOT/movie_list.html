@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>电影分类</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    } </script>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <!-- start plugins -->
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:100,200,300,400,500,600,700,800,900'
+          rel='stylesheet' type='text/css'>
+    <style>
+        .pageNum {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .pageNum ul li {
+            width: 40px;
+            height: 40px;
+            float: left;
+            border: 1px solid #d1d1d1;
+            margin-right: 10px;
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .pageNum ul li.curPage {
+            background-color: #d1d1d1;
+        }
+
+        .pageNum ul li a {
+            width: 100%;
+            height: 100%;
+            color: #000;
+            font-size: 14px;
+        }
+
+        .pageNum ul .threeword {
+            width: 75px;
+        }
+
+    </style>
+    <script>
+        $(function () {
+            var cid = location.search.split('=')[1];
+            load(cid);
+        })
+
+        function load(cid, currentPage) {
+            $.get('/zzMovies/movie/queryPage',
+                {cid: cid, currentPage: currentPage},
+                function (pb) {
+                    $("#totalCount").html(pb.totalCount);
+                    $("#totalPage").html(pb.totalPage);
+                    var start = pb.currentPage - 5;
+                    var end = pb.currentPage + 4;
+                    // 前面不足5个, 后面补齐
+                    if (start < 1) {
+                        start = 1;
+                        end = start + 9;
+                    }
+                    if (end > pb.totalPage) {
+                        end = pb.totalPage;
+                        start = end - 9;
+                    }
+                    if (pb.totalPage < 10) {
+                        start = 1;
+                        end = pb.totalPage;
+                    }
+                    var lis = '';
+                    var firstPage = '<li class="threeword" style="margin-left: 20px"><a href="javascript:load(' + cid + ',1)">首页</a></li>';
+                    var beforeNum = pb.currentPage - 1;
+                    if (beforeNum < 1) {
+                        beforeNum = 1;
+                    }
+                    var beforePage = '<li class="threeword"><a href="javascript:load(' + cid + ', ' + beforeNum + ')">上一页</a></li>';
+                    lis += firstPage;
+                    lis += beforePage;
+                    for (var i = start; i <= end; i++) {
+                        var li;
+                        if (i == pb.currentPage) {
+                            li = '<li class="curPage" onclick="load(' + cid + ',' + i + ')"><a href="javascript:;">' + i + '</a></li>';
+                        } else {
+                            li = '<li onclick="load(' + cid + ',' + i + ')"><a href="javascript:;">' + i + '</a></li>';
+                        }
+                        lis += li;
+                    }
+                    var nextNum = pb.currentPage + 1;
+                    if (nextNum > pb.totalPage) {
+                        nextNum = pb.totalPage;
+                    }
+                    var nextPage = '<li class="threeword"><a href="javascript:load(' + cid + ',' + nextNum + ')">下一页</a></li>';
+                    var lastPage = '<li class="threeword"><a href="javascript:load(' + cid + ',' + pb.totalPage + ')">末页</a></li>';
+                    lis += nextPage;
+                    lis += lastPage;
+                    $("#page").html(lis);
+                    var lisList = '';
+                    for (var i = 0; i < pb.list.length; i++) {
+                        var movie = pb.list[i];
+                        var li = '<li>\n' +
+                            '        <div class="movie movie-test movie-test-dark movie-test-left">\n' +
+                            '           <div class="movie__images">\n' +
+                            '              <a href="movie.html?mid=' + movie.mid + '" class="movie-beta__link">\n' +
+                            '                 <img alt="" src="' + movie.smallImg + '" class="img-responsive" style="width: 400px;height: 273.55px" alt=""/>\n' +
+                            '              </a>\n' +
+                            '           </div>\n' +
+                            '           <div class="movie__info">\n' +
+                            '              <a href="movie.html?mid=' + movie.mid + '" class="movie__title" style="font-size: 18px">' + movie.mName + '</a>\n' +
+                            '                 <p class="movie__option" style="font-size: 13px"><a href="movie.html?mid=' + movie.mid + '">国家</a> | ' + movie.country + '\n' +
+                            '                    <br>演员: ' + movie.actor + '\n' +
+                            '                 </p>\n' +
+                            '                 <ul class="list_6">\n' +
+                            '                     <li><i class="icon1"> </i>\n' +
+                            '                        <p>' + movie.count + '</p>\n' +
+                            '                     </li>\n' +
+                            '                     <li>Rating : &nbsp;&nbsp;\n' +
+                            '                        <p>' + movie.mScore + '</p>\n' +
+                            '                     </li>\n' +
+                            '                     <div class="clearfix"></div>\n' +
+                            '                 </ul>\n' +
+                            '           </div>\n' +
+                            '           <div class="clearfix"></div>\n' +
+                            '        </div>\n' +
+                            '     </li>';
+                        lisList += li;
+                    }
+                    $("#list").html(lisList);
+                },
+                "json"
+            );
+
+            $.get('/zzMovies/movie/findTopThree',
+                {},
+                function (data) {
+                    var list = '';
+                    for (var i = 0; i < data.length; i++) {
+                        var movie = data[i];
+                        var li = '<div class="movie_img">\n' +
+                            '                        <div class="grid_2">\n' +
+                            '                            <div class="movie__images">\n' +
+                            '                               <a href="movie.html?mid=' + movie.mid + '" class="movie-beta__link"><img src="' + movie.smallImg + '" class="img-responsive" alt=""></a>\n' +
+                            '                            </div>\n' +
+                            '                            <div>\n' +
+                            '                               <i class="icon5" style="color: red;float: left;margin-top: 3px"></i>\n' +
+                            '                               <p style="float: left">收藏数:&nbsp;&nbsp;' + movie.count + '</p>\n' +
+                            '                               <br><a href="movie.html?mid=' + movie.mid + '" class="movie__title" style="font-size: 20px">' + movie.mName + '</a>\n' +
+                            '                            </div>\n' +
+                            '                        </div>\n' +
+                            '                    </div>';
+                        list += li;
+                    }
+                    $("#rightImg").html(list);
+                },
+                "json"
+            );
+
+            $.get('/zzMovies/category/findCName',
+                {cid: cid},
+                function (cname) {
+                    $("#cat_cname").html(cname+'片');
+                }, "json");
+        }
+        function selectMovie() {
+            // location.href='/zzMovies/login.html';
+            $.post('/zzMovies/movie/selectMovie',{title:$("#title_1").val()},
+                function (data) {
+                    var lisList = '';
+                    if (data.length==0){
+                        alert("未找到！")
+                    }
+                    for (var i = 0; i < data.length; i++) {
+                        var movie = data[i];
+                        var li = '<li>\n' +
+                            '        <div class="movie movie-test movie-test-dark movie-test-left">\n' +
+                            '           <div class="movie__images">\n' +
+                            '              <a href="movie.html?mid=' + movie.mid + '" class="movie-beta__link">\n' +
+                            '                 <img alt="" src="' + movie.smallImg + '" class="img-responsive" style="width: 400px;height: 273.55px" alt=""/>\n' +
+                            '              </a>\n' +
+                            '           </div>\n' +
+                            '           <div class="movie__info">\n' +
+                            '              <a href="movie.html?mid=' + movie.mid + '" class="movie__title" style="font-size: 18px">' + movie.mName + '</a>\n' +
+                            '                 <p class="movie__option" style="font-size: 13px"><a href="movie.html?mid=' + movie.mid + '">国家</a> | ' + movie.country + '\n' +
+                            '                    <br>演员: ' + movie.actor + '\n' +
+                            '                 </p>\n' +
+                            '                 <ul class="list_6">\n' +
+                            '                     <li><i class="icon1"> </i>\n' +
+                            '                        <p>' + movie.count + '</p>\n' +
+                            '                     </li>\n' +
+                            '                     <li>Rating : &nbsp;&nbsp;\n' +
+                            '                        <p>' + movie.mScore + '</p>\n' +
+                            '                     </li>\n' +
+                            '                     <div class="clearfix"></div>\n' +
+                            '                 </ul>\n' +
+                            '           </div>\n' +
+                            '           <div class="clearfix"></div>\n' +
+                            '        </div>\n' +
+                            '     </li>';
+                        lisList += li;
+                    }
+                    $("#list").html(lisList);
+                    $("#cat_cname").html("搜索结果：");
+                    $("#page").remove();
+                    $(".page_num_inf").html('共<span id="totalCount">'+data.length+'</span>条电影信息');
+                },"json");
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="container_wrap">
+        <!--引入头部-->
+        <div id="header"></div>
+        <div class="content">
+            <div class="search">
+                <form>
+                    <input id="title_1" type="text" value="" >
+                    <input type="button" onclick="selectMovie()">
+                </form>
+            </div>
+            <h2 class="m_3"><span id="cat_cname" style="margin-left: 38px"></span></h2>
+            <div class="movie_top">
+                <div class="col-md-9 movie_box">
+                    <ul id="list" style="list-style-type: none">
+
+                    </ul>
+                    <div class="clearfix"></div>
+                    <div class="page_num_inf" style="margin-left: 40px">
+                        <i></i>共
+                        <span id="totalPage"></span>页&nbsp;&nbsp;&nbsp;&nbsp;<span id="totalCount"></span>条电影信息
+                    </div>
+                    <br>
+                    <div class="pageNum">
+                        <ul id="page" class="list-unstyled list-inline" style="margin-left: 18px">
+
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <!--右边-->
+                <div class="col-md-3" id="rightImg">
+                    <div class="movie_img">
+                        <div class="grid_2">
+                            <img src="images/pic6.jpg" class="img-responsive" alt="">
+                            <div class="caption1">
+                                <ul class="list_5 list_7">
+                                    <li><i class="icon5"> </i>
+                                        <p>3,548</p></li>
+                                </ul>
+                                <i class="icon4 icon6 icon7"> </i>
+                                <p class="m_3">Guardians of the Galaxy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div id="footer"></div>
+</div>
+<!--导入布局js，共享header和footer-->
+<script type="text/javascript" src="js/include.js"></script>
+</body>
+</html>
