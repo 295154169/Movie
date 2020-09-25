@@ -68,9 +68,4 @@ public final class MailUtils {
         return false;
     }
 
-    // 做测试用
-//    public static void main(String[] args) throws Exception {
-//        com.zzMovies.util.MailUtils.sendMail("425788182@qq.com","这是我的测试","测试用");
-//        System.out.println("发送成功");
-//    }
 }
