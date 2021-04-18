@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
             user.setCode(UuidUtil.getUuid());
             user.setName("新用户" + (int) (Math.random() * 100000 + 1));
             ud.saveUser(user);
-            String text = "感谢您注册我们的账号，点击下面的链接即可激活您的账户<a href='http://192.168.56.101/zzMovies/user/active?code=" + user.getCode() + "'>账号激活</a>";
+            String text = "感谢您注册我们的账号，点击下面的链接即可激活您的账户<a href='http://localhost:8888//zzMovies/user/active?code=" + user.getCode() + "'>账号激活</a>";
             MailUtils.sendMail(user.getEmail(), text, user.getEmail() + "的激活邮件");
             return true;
         } catch (Exception e) {

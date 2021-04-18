@@ -116,7 +116,7 @@ public class UserServlet extends BaseServlet {
     }
 
     //修改用户信息
-    public void update(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void update(HttpServletRequest request, HttpServletResponse response) throws Exception {
         // 1. 接收请求参数
         User loginUser = (User) request.getSession().getAttribute("loginUser");
         Map<String, String[]> map = request.getParameterMap();
@@ -129,7 +129,7 @@ public class UserServlet extends BaseServlet {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        System.out.println(user);
+        user.setPassword(com.zzMovies.util.Md5Util.encodeByMd5(user.getPassword()));
         boolean flag = us.updateUser(user);
         ResultInfo info = new ResultInfo();
         info.setFlag(flag);
