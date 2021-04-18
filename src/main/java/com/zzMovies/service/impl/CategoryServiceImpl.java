@@ -17,24 +17,27 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> findAll() {
-        Jedis jedis = JedisUtil.getJedis();
-        Set<Tuple> categorys = jedis.zrangeWithScores("movie_category", 0, -1);
-        if (categorys == null || categorys.size() == 0) {
-            List<Category> list = categoryDao.findAllCategory();
-            for (Category cate : list) {
-                jedis.zadd("movie_category", cate.getCid(), cate.getCname());
-            }
-            return list;
-        } else {
-            List<Category> list = new ArrayList<>();
-            for (Tuple tuple : categorys) {
-                Category category = new Category();
-                category.setCid((int) tuple.getScore());
-                category.setCname(tuple.getElement());
-                list.add(category);
-            }
-            return list;
-        }
+//        Jedis jedis = JedisUtil.getJedis();
+//        Set<Tuple> categorys = jedis.zrangeWithScores("movie_category", 0, -1);
+//        if (categorys == null || categorys.size() == 0) {
+//            List<Category> list = categoryDao.findAllCategory();
+//            for (Category cate : list) {
+//                jedis.zadd("movie_category", cate.getCid(), cate.getCname());
+//            }
+//            return list;
+//        } else {
+//            List<Category> list = new ArrayList<>();
+//            for (Tuple tuple : categorys) {
+//                Category category = new Category();
+//                category.setCid((int) tuple.getScore());
+//                category.setCname(tuple.getElement());
+//                list.add(category);
+//            }
+//            jedis.close();
+//            return list;
+//        }
+        List<Category> list = categoryDao.findAllCategory();
+        return list;
     }
 
     @Override

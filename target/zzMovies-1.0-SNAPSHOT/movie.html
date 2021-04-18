@@ -54,13 +54,8 @@
                             '                            </li>';
                     }
                     $("#single_list").html(lis);
-
+                    $("#comments").html('当前共' + data.length + '条评论');
                 }, "json");
-
-            $.get('/zzMovies/movie/findCount', {mid:mid},
-                function (count) {
-                    $("#comments").html('当前共' + count + '条评论');
-                }, "json")
         }
 
         function click(mid) {
